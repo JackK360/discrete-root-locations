@@ -1,11 +1,12 @@
 %% drawing boundaries for discrete root locations
 clear all ; close all
 %% performance constrains
-ts0 = 3; %maximum settling time [s]
-Mp0=.20;
-tr0=1;
+ts0 = .8; %maximum settling time [s]
+ts0_min=.6;
+Mp0=.2;
+tr0=.5;
 %% hardware constraints
-f_s=5; %sampling frequency [hz]
+f_s=20; %sampling frequency [hz]
 omega_s=2*pi*f_s; %sampling frequency 
 T=1/f_s ;% sampling period [s]
 theta=(0:pi/50:2*pi)';
@@ -23,11 +24,20 @@ ax.FontSize = 16;
 
 %% settling time constraint
 mag_ts=exp(-(4/ts0)*T);
+min_ts=exp(-(4/ts0_min)*T);
 
 real_ts=mag_ts*cos(theta);
 imag_ts=mag_ts*sin(theta);
 
-p2=fill(real_ts,imag_ts,'g','LineStyle','none');
+real_ts_min=min_ts*cos(theta);
+imag_ts_min=min_ts*sin(theta);
+
+xcombined=[real_ts;real_ts_min];
+ycombined=[imag_ts;imag_ts_min];
+
+
+
+p2=fill(xcombined,ycombined,'g','LineStyle','none');
 alpha(0.25);
 
 %% overshoot
@@ -60,11 +70,13 @@ imag_tr=mag_tr.*sin(ang_tr);
 real_tr_2=[flipud(real_tr);1*cos((ang_tr(1):0.1:pi)')]
 imag_tr_2=[flipud(imag_tr);1*sin((ang_tr(1):0.1:pi)')]
 
+
 real_tr_3=[real_tr_2;flipud(real_tr_2)];
 imag_tr_3=[imag_tr_2;flipud(-imag_tr_2)];
 
 p4=fill(real_tr_3,imag_tr_3,'r-','LineStyle','none');
 alpha(.25)
+
 
 legend([p1,p2,p3,p4],{'stability condition',...
                         't_s condition',...
@@ -73,3 +85,5 @@ legend([p1,p2,p3,p4],{'stability condition',...
                     
 legend('boxoff')
 zgrid
+
+plot(-.75,0,'ko')
